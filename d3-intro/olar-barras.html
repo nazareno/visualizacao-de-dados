@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<style>
+
+.chart div {
+  font: 10px sans-serif;
+  background-color: steelblue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: white;
+}
+</style>
+
+<div class="chart" id="a-visualizacao">
+</div>
+
+<script src="./js/vendor/d3.v4.js"></script>
+
+<script type="text/javascript">
+var data = [4, 8, 15, 16, 23, 42];
+/*
+ * Versão 1
+ */
+d3.select(".chart") // 1o seletor
+  .selectAll("div") // 2o seletor dentro do 1o
+    .data(data)     // join dos dados
+  .enter().append("div")     // enter adiciona um elemento pra cada dado
+    .style("width", function(d) { return d * 10 + "px"; }) // transformando o elemento
+    .text(function(d) { return d; });
+
+/*
+ * Versão 2
+ */
+// d3.select("#a-visualizacao")
+//   .selectAll("div")
+//     .data(data)
+//   .enter().append("div")
+//     .style("width", function(d) { return d * 20 + "px"; })
+//     .style("background-color", "red")
+//     .text(function(d) { return d; });
+
+/*
+ * Versão 3: sem números mágicos
+ * usaremos uma função de escala que mapeia valores para um canal de posição, tamannho ou cor
+ * veja mais em https://github.com/d3/d3-scale/blob/master/README.md
+ */
+// var w = 300
+// var mapeia_x = d3.scaleLinear()
+//     .domain([0, d3.max(data)])
+//     .range([0, w]);
+//
+// d3.select(".chart")
+//   .selectAll("div")
+//     .data(data)
+//   .enter().append("div")
+//     .style("width", function(d) { return mapeia_x(d) + "px"; })
+//     .text(function(d) { return d; });
+
+</script>
