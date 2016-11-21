@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.chart rect {
+  fill: steelblue;
+}
+
+.chart text {
+  fill: white;
+  font: 10px sans-serif;
+  text-anchor: end;
+}
+
+</style>
+
+<svg class="chart"></svg>
+
+<script src="./js/vendor/d3.v4.js"></script>
+
+<script>
+
+var data = [4, 8, 15, 16, 23, 42];
+
+var width = 420,
+    barHeight = 20;
+
+var x = d3.scaleLinear()
+    .domain([0, d3.max(data)])
+    .range([0, width]);
+
+var chart = d3.select(".chart") // configura o tamanho do svg inteiro
+    .attr("width", width)
+    .attr("height", barHeight * data.length);
+
+var bar = chart.selectAll("g") // inicialmente não há nenhum g
+    .data(data)                // join dos dados
+  .enter().append("g")         // enter adiciona elementos, um pra cada dado
+    .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+
+// bar contém uma seleção de grupos g
+bar.append("rect")       // para cada g, adicione um rect
+    .attr("width", x)
+    .attr("height", barHeight - 1);
+
+bar.append("text") // para cada g, um texto
+    .attr("x", function(d) { return x(d) - 3; })
+    .attr("y", barHeight / 2)
+    .attr("dy", ".35em")
+    .text(function(d) { return d; });
+
+</script>
