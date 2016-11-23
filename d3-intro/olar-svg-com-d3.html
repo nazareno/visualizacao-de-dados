@@ -1,52 +1,127 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<style>
+<head>
+  <meta charset="utf-8">
+  <title>Um gráfico de barras feitos de divs</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <style>
 
-.chart rect {
-  fill: steelblue;
-}
+  .chart rect {
+    fill: steelblue;
+  }
 
-.chart text {
-  fill: white;
-  font: 10px sans-serif;
-  text-anchor: end;
-}
+  .chart text {
+    fill: white;
+    font: 10px sans-serif;
+    text-anchor: end;
+  }
 
-</style>
+  .red {
+    fill: red; /* not background-color! */
+  }
 
-<svg class="chart"></svg>
+  .fancy {
+    fill: none;
+    stroke: black; /* similar to border-color */
+    stroke-width: 3pt; /* similar to border-width */
+    stroke-dasharray: 3,5,10;
+  }
+  </style>
+</head>
 
-<script src="./js/vendor/d3.v4.js"></script>
+<div class="container">
+  <div class="row">
+    <h2>Um SVG estático</h2>
+  </div>
+  <div class="row">
+    <svg width="300" height="180">
+      <circle cx="30"  cy="50" r="25" />
+      <circle cx="90"  cy="50" r="25" class="red" />
+      <circle cx="150" cy="50" r="25" class="fancy" />
 
-<script>
+      <rect x="10"  y="80" width="40" height="40"
+        fill="steelBlue" />
+      <rect x="70"  y="80" width="40" height="40"
+        style="fill: steelBlue" />
+      <rect x="130" y="80" width="40" height="40"
+        class="fancy" />
+    </svg>
+  </div>
 
-var data = [4, 8, 15, 16, 23, 42];
+  <div class="row"><h2>Um SVG dinâmico</h2></div>
 
-var width = 420,
-    barHeight = 20;
+  <div class="row">
+    <svg class="chart"></svg>
+  </div>
 
-var x = d3.scaleLinear()
-    .domain([0, d3.max(data)])
-    .range([0, width]);
+  <div class="row">
+    <br>
+    Para mais emoções, vamos para <a href="./barras-verticais-uhuu.html">barras verticais! (uhuu!)</a>
+  </div>
 
-var chart = d3.select(".chart") // configura o tamanho do svg inteiro
-    .attr("width", width)
-    .attr("height", barHeight * data.length);
+  <script src="./js/vendor/d3.v4.js"></script>
 
-var bar = chart.selectAll("g") // inicialmente não há nenhum g
-    .data(data)                // join dos dados
-  .enter().append("g")         // enter adiciona elementos, um pra cada dado
-    .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+  <script>
+    "use strict";
+    var data = [4, 8, 15, 16, 23, 42];
 
-// bar contém uma seleção de grupos g
-bar.append("rect")       // para cada g, adicione um rect
-    .attr("width", x)
-    .attr("height", barHeight - 1);
+    var width = 420,
+        barHeight = 20;
 
-bar.append("text") // para cada g, um texto
-    .attr("x", function(d) { return x(d) - 3; })
-    .attr("y", barHeight / 2)
-    .attr("dy", ".35em")
-    .text(function(d) { return d; });
+    var chart = d3.select(".chart") // configura o tamanho do svg inteiro
+                  .attr("width", width);
 
-</script>
+    var x = d3.scaleLinear().range([0, width]);
+    // var x = d3.scaleSqrt().range([0, width]);
+
+    /*
+     * Desenha o gráfico de barras no SVG oSvg
+     */
+    var desenhaBarras = function(oSvg, escala, dados){
+      x.domain([0, d3.max(dados)]); // só conhecemos o domínio com os dados
+      oSvg.attr("height", barHeight * dados.length) // idem pra o número de barras
+
+      var bar = oSvg.selectAll("g") // inicialmente não há nenhum g
+          .data(dados)               // join dos dados
+        .enter().append("g")         // enter adiciona elementos, um pra cada dado
+          .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+      // em d3 não dizemos "desenhe n barras"
+      // dizemos "quero que a seleção barras corresponda a esses dados"
+
+      // bar contém uma seleção de grupos g
+      bar.append("rect")            // para cada g, adicione um rect
+          .attr("width", escala)    // aqui informamos uma escala
+          .attr("height", barHeight - 1); // espaço entre barras de 1
+
+      bar.append("text") // para cada g, um texto
+          .attr("x", function(d) { return x(d) - 3; })
+          .attr("y", barHeight / 2)
+          .attr("dy", ".35em")
+          .text(function(d) { return d; });
+
+      // cadastrando listeners para os rects
+      bar.selectAll("rect").on('mouseover', function() {
+        this.style.fill = 'darkorange';  // um design melhor é fazer iso com classes css
+      })
+      .on('mouseleave', function() {
+        this.style.fill = 'steelblue';
+      });
+    }
+
+    /*
+     * Versão 1
+     */
+    desenhaBarras(chart, x, data);
+
+    /*
+     * Versão 2: com dados baixados de maneira assíncrona
+     * (o html & cia devem ser acessados via um servidor web )
+     */
+    // d3.csv("dados/vendas_artistas_br_editado.csv", function(error, dadosBaixados){
+    //   var vendas = dadosBaixados.map(function(d){return d["Vendas estimadas (milhões)"]});
+    //   // console.log(vendas); // todos os valores vêm como string, cuidado!
+    //   vendas = vendas.map(function(d){return +d});
+    //   desenhaBarras(chart, x, vendas);
+    // });
+
+  </script>
+</body>

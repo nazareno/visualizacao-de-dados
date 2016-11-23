@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <title>Um gráfico de barras feitos de divs</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <style>
+  .chart rect {
+    fill: steelblue;
+  }
+  .chart text {
+    fill: white;
+    font: 10px sans-serif;
+    text-anchor: middle;
+  }
+  </style>
+</head>
+
+<h2>Vis 1</h2>
+
+<svg id="vis1" class="chart"></svg>
+
+<br><br>
+
+<h2>Vis 2</h2>
+
+<script src="./js/vendor/d3.v4.js"></script>
+
+<script>
+
+var width = 700,
+    height = 400;
+
+var y = d3.scaleLinear()
+    .range([height, 0]);
+
+var chart1 = d3.select("#vis1")
+    .attr("width", width)
+    .attr("height", height);
+
+d3.tsv("dados/letras.tsv", type, function(error, data) {
+  if (error) throw error;
+
+  y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
+
+  var barWidth = width / data.length;
+
+  var bar = chart1.selectAll("g")
+      .data(data)
+    .enter().append("g")
+      .attr("transform", function(d, i) { return "translate(" + i * barWidth + ",0)"; });
+
+  bar.append("rect")
+      .attr("y", function(d) { return y(d.frequency); })
+      .attr("height", function(d) { return height - y(d.frequency); })
+      .attr("width", barWidth - 1);
+
+  bar.append("text")
+      .attr("x", barWidth / 2)
+      .attr("y", function(d) { return y(d.frequency) + 3; })
+      //.attr("y", height - 10)
+      .attr("dy", ".75em")
+      .text(function(d) { return (d.frequency + '').toString().substring(1,4); });
+});
+
+function type(d) {
+  d.frequency = +d.frequency; // coerce to number
+  return d;
+}
+
+</script>
