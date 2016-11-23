@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <title>Agora com eixos!</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <style>
+  .bar {
+    fill: orange;
+  }
+
+  .prob {
+    fill: white;
+    font: 10px sans-serif;
+    text-anchor: middle;
+  }
+
+  .bar:hover {
+    fill: brown;
+  }
+
+  .axis--x path {
+    display: none;
+  }
+  </style>
+</head>
+
+<h2>Vis 1</h2>
+
+<svg id="vis1" class="chart"></svg>
+
+<br><br>
+
+
+<script src="./js/vendor/d3.v4.js"></script>
+
+<script>
+"use strict";
+
+var totalWidth = 700,
+    totalHeight = 400;
+
+// o svg
+var chart1 = d3.select("#vis1")
+    .attr("width", totalWidth)
+    .attr("height", totalHeight);
+
+/*
+ * Margens. Esse código funcionará mesmo se o tamanho do SVG for
+ * dado no html em si, e não no js
+ */
+var margin = {top: 20, right: 30, bottom: 30, left: 40},
+  width = +chart1.attr("width") - margin.left - margin.right,
+  height = +chart1.attr("height") - margin.top - margin.bottom;
+
+var g = chart1.append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+/* Escalas.
+ * Os domínios vem só depois de termos os dados.
+ */
+var y = d3.scaleLinear()
+    .range([height, 0]);
+
+var x = d3.scaleBand() // um tipo de escala ordinal em vaixas
+    .rangeRound([0, width])
+    .padding(0.1);
+
+d3.tsv("dados/letras.tsv", type, function(error, data) {
+  if (error) throw error;
+
+  y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
+  x.domain(data.map(function(d) { return d.letter; }));
+
+  // adiciona os eixos
+  g.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  g.append("g")
+       .attr("class", "axis axis--y")
+       .call(d3.axisLeft(y).ticks(10, "%"))
+     .append("text")
+       .attr("transform", "rotate(-90)")
+       .attr("y", 6)
+       .attr("dy", "0.71em")
+       .attr("text-anchor", "end")
+       .attr("fill", "black")
+       .text("Frequency");
+
+  // barras como antes
+  var bar = g.selectAll(".bar") // não selecionams 'g' para evitar os eixos
+      .data(data)
+    .enter().append("g")
+      .attr("transform", function(d, i) { return "translate(" + x(d.letter) + ",0)"; });
+
+  bar.append("rect")
+      .attr("class", "bar")
+      .attr("y", function(d) { return y(d.frequency); })
+      .attr("height", function(d) { return height - y(d.frequency); })
+      .attr("width", x.bandwidth());
+
+  // bar.append("text")
+  //     .attr("class", "prob")
+  //     .attr("x", x.bandwidth() / 2) // já estamos dentro de um g com translate
+  //     .attr("y", function(d) { return y(d.frequency) + 3; })
+  //     //.attr("y", height - 10)
+  //     .attr("dy", ".75em")
+  //     .text(function(d) { return (d.frequency + '').toString().substring(1,4); });
+});
+
+function type(d) {
+  d.frequency = +d.frequency; // coerce to number
+  return d;
+}
+
+</script>
