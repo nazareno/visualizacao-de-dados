@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<style>
+
+.chart div {
+  font: 10px sans-serif;
+  background-color: steelblue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: white;
+}
+</style>
+
+<div class="chart" id="a-visualizacao">
+</div>
+
+<script type="text/javascript">
+var data = [4, 8, 15, 16, 23, 42];
+var chart_div = document.getElementById("a-visualizacao");
+
+data.forEach(function (e, i, a) {
+    var bar = document.createElement("div");
+    bar.setAttribute("style", "width: " + (e * 10) + "px;")
+    bar.appendChild(document.createTextNode(e));
+
+    chart_div.appendChild(bar);
+});
+
+</script>
