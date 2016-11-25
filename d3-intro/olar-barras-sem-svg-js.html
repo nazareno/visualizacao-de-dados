@@ -16,14 +16,14 @@
 
 <script type="text/javascript">
 var data = [4, 8, 15, 16, 23, 42];
-var chart_div = document.getElementById("a-visualizacao");
+var chart_div = document.getElementById("a-visualizacao"); // seleciono o nó do DOM com id 'a-visualizacao'
 
 data.forEach(function (e, i, a) {
-    var bar = document.createElement("div");
-    bar.setAttribute("style", "width: " + (e * 10) + "px;")
-    bar.appendChild(document.createTextNode(e));
+    var bar = document.createElement("div"); // para cada elemento do array é criada uma 'div'
+    bar.setAttribute("style", "width: " + (e * 10) + "px;"); // define o attributo 'style' da div com a largura da barra
+    bar.appendChild(document.createTextNode(e)); // adiciona o texto na barra
 
-    chart_div.appendChild(bar);
+    chart_div.appendChild(bar); // adiciona a barra criada ao documento no nó 'a-visualizacao'
 });
 
 </script>
